@@ -1,5 +1,10 @@
 # AdvancedDB
 
+## Connect To Master
+```
+ssh user@83.212.79.239
+```
+
 ## Import Data To HDFS
 ```
 wget http://www.cslab.ntua.gr/courses/atds/movie_data.tar.gz
