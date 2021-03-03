@@ -1,6 +1,4 @@
 #!/bin/python3
-# import pandas as pd 
-import pyspark.sql.functions as f
 from pyspark.sql import SparkSession
 from io import StringIO
 import csv

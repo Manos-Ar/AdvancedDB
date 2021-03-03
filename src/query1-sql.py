@@ -3,13 +3,7 @@
 from pyspark.sql import SparkSession
 from io import StringIO
 import csv
-
-def split_complex(x):
-    return list(csv.reader(StringIO(x), delimiter=','))[0]
-
-
 spark = SparkSession.builder.appName("query1-sql").getOrCreate()
-# sc = spark.sparkContext
 
 df_csv = spark.read.csv('hdfs://master:9000/movie_data/movies.csv',inferSchema='true')
 
