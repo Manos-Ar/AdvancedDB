@@ -17,7 +17,13 @@ rsync -vr --delete . user@83.212.79.239:/home/user/src
 
 ## Hadoop Commands
 
-Ls
+- Ls
 ```
 hadoop fs -ls hdfs://master:9000/movie_data
+```
+
+- Remove
+
+```
+hadoop fs -rm hdfs://master:9000/movie_data/<file-name>
 ```
