@@ -3,6 +3,10 @@ from pyspark.sql import SparkSession
 from io import StringIO
 import csv
 
+import sys
+
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
+
 def mapper1(x):
     tokens=x.split(",")
     _id=int(tokens[1])

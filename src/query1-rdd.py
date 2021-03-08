@@ -2,6 +2,10 @@
 from pyspark.sql import SparkSession
 from io import StringIO
 import csv
+import sys
+
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
+
 
 def split_complex(x):
     return list(csv.reader(StringIO(x), delimiter=','))[0]

@@ -8,7 +8,7 @@ import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
-spark = SparkSession.builder.appName("query2-sql").getOrCreate()
+spark = SparkSession.builder.appName("query4-sql").getOrCreate()
 
 def count_review_words(x):
     if x is None:
