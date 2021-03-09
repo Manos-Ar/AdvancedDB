@@ -10,25 +10,25 @@ sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 spark = SparkSession.builder.appName("query5-sql").getOrCreate()
 
-movies_genres_csv = spark.read.csv('hdfs://master:9000/movie_data/movie_genres.csv',inferSchema='true')
-movies_data_csv = spark.read.csv('hdfs://master:9000/movie_data/movies.csv',inferSchema='true')
-ratings_csv = spark.read.csv('hdfs://master:9000/movie_data/ratings.csv',inferSchema='true')
+movies_genres_parquet = spark.read.load('hdfs://master:9000/movie_data/movie_genres.parquet')
+movies_data_parquet = spark.read.load('hdfs://master:9000/movie_data/movies.parquet')
+ratings_parquet = spark.read.load('hdfs://master:9000/movie_data/ratings.parquet')
 
-movies_genres_csv.printSchema()
-movies_data_csv.printSchema()
-ratings_csv.printSchema()
+movies_genres_parquet.printSchema()
+movies_data_parquet.printSchema()
+ratings_parquet.printSchema()
 
-movies_genres_csv.registerTempTable("movies_genres_csv")
-movies_data_csv.registerTempTable("movies_csv")
-ratings_csv.registerTempTable("ratings_csv")
+movies_genres_parquet.registerTempTable("movies_genres_parquet")
+movies_data_parquet.registerTempTable("movies_parquet")
+ratings_parquet.registerTempTable("ratings_parquet")
 
 temp1 = spark.sql("select user_id,rating,movie_id,genre\
                     from\
                     (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-                    from ratings_csv)\
+                    from ratings_parquet)\
                     join\
                     (select _c1 as genre, _c0 as movie_id\
-                    from movies_genres_csv)\
+                    from movies_genres_parquet)\
                     using (movie_id)")
 
 temp1.registerTempTable("join_genres_rating")
@@ -57,7 +57,7 @@ temp4 = spark.sql(" select *\
                     from\
                     (select _c0 as movie_id, _c1 as title\
                     from\
-                    movies_csv)\
+                    movies_parquet)\
                     join\
                     join_genres_rating\
                     using(movie_id)")
@@ -81,7 +81,7 @@ temp6 = spark.sql(" select m.genre,m.user_id,max_movie_id,max_movie_title,max_ra
 temp6.registerTempTable("temp6")
 
 temp7 = spark.sql(" select _c1 as movie_id, count(_c1) as movie_popularity\
-                    from ratings_csv\
+                    from ratings_parquet\
                     group by _c1")
 
 temp7.registerTempTable("popularity")
@@ -199,10 +199,10 @@ temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_ti
 #             (select user_id,rating,movie_id,genre\
 #             from\
 #             (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-#             from ratings_csv)\
+#             from ratings_parquet)\
 #             join\
 #             (select _c1 as genre, _c0 as movie_id\
-#             from movies_genres_csv)\
+#             from movies_genres_parquet)\
 #             using (movie_id))\
 #             join\
 #             (select genre,user_id, max(max_rating), min(min_rating), max(count) as max_count\
@@ -212,10 +212,10 @@ temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_ti
 #             (select user_id,rating,movie_id,genre\
 #             from\
 #             (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-#             from ratings_csv)\
+#             from ratings_parquet)\
 #             join\
 #             (select _c1 as genre, _c0 as movie_id\
-#             from movies_genres_csv)\
+#             from movies_genres_parquet)\
 #             using (movie_id))\
 #             group by genre,user_id)\
 #             group by genre,user_id)\
@@ -228,10 +228,10 @@ temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_ti
 #             (select user_id,rating,movie_id,genre\
 #             from\
 #             (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-#             from ratings_csv)\
+#             from ratings_parquet)\
 #             join\
 #             (select _c1 as genre, _c0 as movie_id\
-#             from movies_genres_csv)\
+#             from movies_genres_parquet)\
 #             using (movie_id))\
 #             group by genre,user_id)\
 #             group by genre,user_id\
@@ -239,5 +239,5 @@ temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_ti
 
 # join
 # (select _c0 as movie_id, _c1 as title
-# from movies_csv)
+# from movies_parquet)
 # using (movie_id)
