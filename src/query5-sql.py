@@ -45,11 +45,13 @@ temp2 = spark.sql(" select genre,max(count) as max_count\
 
 temp2.registerTempTable("temp2")
 
-temp3 = spark.sql(" select temp1.genre as genre, user_id, max_rating, min_rating, max_count\
+temp3 = spark.sql(" select temp.genre as genre, user_id, max_rating, min_rating, max_count\
                     from temp\
                     join\
                     temp2\
                     on temp.genre=temp2.genre and temp.count=temp2.max_count").show()
+
+
 
 # spark.sql("select *\
 #         from temp").show()
