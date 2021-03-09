@@ -49,9 +49,22 @@ temp3 = spark.sql(" select temp.genre as genre, user_id, max_rating, min_rating,
                     from temp\
                     join\
                     temp2\
-                    on temp.genre=temp2.genre and temp.count=temp2.max_count").show()
+                   on temp.genre=temp2.genre and temp.count=temp2.max_count")
 
+temp3.registerTempTable("temp3")
 
+temp4 = spark.sql(" select *\
+                    from\
+                    (select _c0 as movie_id, _c1 as title\
+                    from\
+                    movies_csv)\
+                    join\
+                    join_genres_rating\
+                    using(movie_id)")
+
+temp4.registerTempTable("join_genres_rating_movies")
+
+tmp5 = spark.sql("  select ")
 
 # spark.sql("select *\
 #         from temp").show()
