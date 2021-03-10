@@ -86,39 +86,6 @@ temp7 = spark.sql(" select _c1 as movie_id, count(_c1) as movie_popularity\
 
 temp7.registerTempTable("popularity")
 
-# temp8 = spark.sql(" select distinct(genre),user_id,movie_id as max_movie_id\
-#                     from\
-#                     (select genre,user_id,max(max_movie_popularity) as max_popularity, movie_id\
-#                     from\
-#                     (select genre, movie_id, user_id, movie_popularity as max_movie_popularity \
-#                     from temp6, popularity\
-#                     where max_movie_id=movie_id)\
-#                     group by user_id,genre)\
-#                     ")
-#
-# temp8.registerTempTable("max_movie_temp")
-#
-# temp9 = spark.sql(" select distinct(genre),user_id,movie_id as min_movie_id\
-#                     from\
-#                     (select genre,user_id,max(max_movie_popularity) as max_popularity, movie_id\
-#                     from\
-#                     (select genre, movie_id, user_id, movie_popularity as max_movie_popularity \
-#                     from temp6, popularity\
-#                     where min_movie_id=movie_id)\
-#                     group by user_id,genre)\
-#                     ")
-#
-# temp9.registerTempTable("min_movie_temp")
-#
-# temp10 = spark.sql("select  genre, max_movie_id,min_movie_id,user_id\
-#                     from \
-#                     temp8\
-#                     join\
-#                     temp9\
-#                     using (genre,user_id)")
-#
-# temp10.registerTempTable("temp10")
-
 temp8 = spark.sql(" select genre, movie_id, user_id, movie_popularity as max_movie_popularity \
                     from temp6, popularity\
                     where max_movie_id=movie_id\
@@ -167,77 +134,13 @@ temp14 = spark.sql("select genre,user_id,max_movie_temp.movie_id as max_movie_id
 
 temp14.registerTempTable("join_popularity")
 
-temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_title,min_rating,max_count as number_of_reviews\
+final = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_title,min_rating,max_count as number_of_reviews\
                     from\
                     temp6\
                     join\
                     join_popularity\
                     using(genre,user_id,max_movie_id,min_movie_id)\
-                    order by genre ASC").show(False)
-# temp9 = spark.sql(" select genre,user_id,max(max_movie_popularity) as max_popularity\
-#                     from temp8\
-#                     group by user_id,genre")
+                    order by genre ASC")
+final.show(truncate = False)
 
-#temp9.registerTempTable("temp9")
-
-# temp10 = spark.sql("select distinct(temp8.genre),temp8.user_id,movie_id\
-#                     from temp9,temp8\
-#                     where temp9.genre=temp8.genre and temp8.user_id=temp9.user_id and max_popularity=max_movie_popularity").show()
-#
-# temp11 = spark.sql()
-
-
-# spark.sql("select *\
-#         from temp").show()
-
-# spark.sql(" select *\
-#             from\
-#             (select genre,  max(count) as max_count\
-#             from\
-#             (select genre,user_id,max(rating) as max_rating,min(rating) as min_rating,count(rating) as count\
-#             from\
-#             (select user_id,rating,movie_id,genre\
-#             from\
-#             (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-#             from ratings_parquet)\
-#             join\
-#             (select _c1 as genre, _c0 as movie_id\
-#             from movies_genres_parquet)\
-#             using (movie_id))\
-#             join\
-#             (select genre,user_id, max(max_rating), min(min_rating), max(count) as max_count\
-#             from\
-#             (select genre,user_id,max(rating) as max_rating,min(rating) as min_rating,count(rating) as count\
-#             from\
-#             (select user_id,rating,movie_id,genre\
-#             from\
-#             (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-#             from ratings_parquet)\
-#             join\
-#             (select _c1 as genre, _c0 as movie_id\
-#             from movies_genres_parquet)\
-#             using (movie_id))\
-#             group by genre,user_id)\
-#             group by genre,user_id)\
-#             using (genre,max_count)) ").show()
-
-# spark.sql(" select genre,user_id, max(max_rating), min(min_rating), max(count) as max_count\
-#             from\
-#             (select genre,user_id,max(rating) as max_rating,min(rating) as min_rating,count(rating) as count\
-#             from\
-#             (select user_id,rating,movie_id,genre\
-#             from\
-#             (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
-#             from ratings_parquet)\
-#             join\
-#             (select _c1 as genre, _c0 as movie_id\
-#             from movies_genres_parquet)\
-#             using (movie_id))\
-#             group by genre,user_id)\
-#             group by genre,user_id\
-#             ").show()
-
-# join
-# (select _c0 as movie_id, _c1 as title
-# from movies_parquet)
-# using (movie_id)
+# final.coalesce(1).write.format('csv').save("/home/user/src/q5_output_sql.txt",header='true')
