@@ -2,10 +2,11 @@
 from pyspark.sql import SparkSession
 from io import StringIO
 import csv
-
+import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
+file = open('times.txt', 'a+')
 
 def mapper1(x):
     tokens=x.split(",")
@@ -24,7 +25,7 @@ sc = spark.sparkContext
 
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
-
+start_time = time.time()
 rating_t = rating.map(mapper1)
 genres_t = genres.map(mapper2)
 
@@ -42,5 +43,7 @@ distinct_genres_movies_count = join_genres_rating.map(lambda x: (x[1][0],x[0])).
 # print(distinct_genres_movies_count.first())
 
 output = mean_rating.join(distinct_genres_movies_count).map(lambda x: (x[0],x[1][0],x[1][1]))
-
+end_time = time.time()
+file.write(str((end_time-start_time)/60)+'\n')
+file.close()
 print(output.collect())

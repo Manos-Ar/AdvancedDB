@@ -4,7 +4,8 @@ from pyspark.sql import SparkSession
 from io import StringIO
 import csv
 import sys
-
+import time
+file = open('times.txt', 'a+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):
@@ -52,6 +53,7 @@ sc = spark.sparkContext
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
 movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
+start_time = time.time()
 
 rating = rating.map(rating_map)
 genres = genres.map(genres_map)
@@ -83,7 +85,7 @@ max_rating_movie = max_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(
 # (movie_id,(((genre,user_id),rating,title,count),popularity))
 # (8446, ((('Family', 45811), 5.0, 'Bugsy Malone', 198), 215))
 # ((genre,user_id),rating,title,count)
-print(max_rating_movie.first())
+#print(max_rating_movie.first())
 
 min_rating = max_genre_user_count.join(join_ratings_genres_movies_format).map(lambda x: (x[0],(x[1][1][0],x[1][1][1],x[1][1][2],x[1][0]))).reduceByKey(lambda x,y: min((x, y), key=lambda x: x[1]))
 min_rating_movie = min_rating.map(lambda x: (x[1][0],(x[0],x[1][1],x[1][2],x[1][3])))
@@ -91,12 +93,15 @@ min_rating_movie = min_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(
 
 output = max_rating_movie.join(min_rating_movie)
 
-print(output.first())
+#print(output.first())
 output = output.map(final_map)
 
 # print(join_ratings_genres_movies_format.first())
 # print(max_rating.first())
 # print(max_rating_movie.first())
+end_time = time.time()
+
+file.write(str((end_time-start_time)/60)+'\n')
 
 print(output.collect())
-
+file.close()

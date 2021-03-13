@@ -4,6 +4,8 @@ from pyspark.sql import SparkSession
 from io import StringIO
 import csv
 import sys
+import time
+file = open('times.txt', 'a+')
 
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
@@ -21,7 +23,7 @@ ratings_csv.printSchema()
 movies_genres_csv.registerTempTable("movies_genres_csv")
 movies_data_csv.registerTempTable("movies_csv")
 ratings_csv.registerTempTable("ratings_csv")
-
+start_time = time.time()
 temp1 = spark.sql("select user_id,rating,movie_id,genre\
                     from\
                     (select _c0 as user_id, _c1 as movie_id, _c2 as rating\
@@ -140,5 +142,9 @@ temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_ti
                     join_popularity\
                     using(genre,user_id,max_movie_id,min_movie_id)\
                     order by genre ASC")
+end_time = time.time()
 
-temp15.show(30)                
+file.write(str((end_time-start_time)/60)+'\n')
+
+file.close()
+temp15.show(30)

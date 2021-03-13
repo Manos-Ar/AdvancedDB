@@ -4,10 +4,10 @@ from pyspark.sql import SparkSession
 from io import StringIO
 import csv
 import sys
-
+import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-
+file = open('times.txt', 'a+')
 spark = SparkSession.builder.appName("query4-sql").getOrCreate()
 
 def count_review_words(x):
@@ -46,7 +46,7 @@ movies_data_csv.printSchema()
 
 movies_genres_csv.registerTempTable("movies_genres_csv")
 movies_data_csv.registerTempTable("movies_csv")
-
+start_time = time.time()
 spark.sql(" select quinq, avg(summary_words) as average_summary\
             from(\
             select title, genre, countWords(summary) as summary_words, quinquennium(year) as quinq \
@@ -60,7 +60,9 @@ spark.sql(" select quinq, avg(summary_words) as average_summary\
             where genre='Drama')\
             where quinq <> 'x'\
             group by quinq").show()
+end_time = time.time()
 
+file.write(str((end_time-start_time)/60)+'\n')
 
 
 movies_genres_parquet = spark.read.load('hdfs://master:9000/movie_data/movie_genres.parquet')
@@ -69,7 +71,7 @@ movies_data_parquet = spark.read.load('hdfs://master:9000/movie_data/movies.parq
 movies_genres_parquet.registerTempTable("movies_genres_parquet")
 movies_data_parquet.registerTempTable("movies_data_parquet")
 
-
+start_time = time.time()
 spark.sql(" select quinq, avg(summary_words) as average_summary\
             from(\
             select title, genre, countWords(summary) as summary_words, quinquennium(year) as quinq \
@@ -83,3 +85,8 @@ spark.sql(" select quinq, avg(summary_words) as average_summary\
             where genre='Drama')\
             where quinq <> 'x'\
             group by quinq").show()
+end_time = time.time()
+
+file.write(str((end_time-start_time)/60)+'\n')
+
+file.close()

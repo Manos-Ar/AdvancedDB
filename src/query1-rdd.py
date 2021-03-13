@@ -3,9 +3,11 @@ from pyspark.sql import SparkSession
 from io import StringIO
 import csv
 import sys
+import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
+file = open('times.txt', 'a+')
 
 def split_complex(x):
     return list(csv.reader(StringIO(x), delimiter=','))[0]
@@ -33,7 +35,12 @@ rdd = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 
 # print(rdd.take(10))
 
-
+start_time = time.time()
 rdd = rdd.map(split_complex).filter(filter1).map(mapper1).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1])).map(lambda x:(x[0],x[1][0])).sortByKey()
 
+end_time = time.time()
+
+file.write(str((end_time-start_time)/60)+'\n')
+
+file.close()
 print(rdd.collect())
