@@ -31,6 +31,9 @@ sc = spark.sparkContext
 
 rdd = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 
+# print(rdd.take(10))
+
+
 rdd = rdd.map(split_complex).filter(filter1).map(mapper1).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1])).map(lambda x:(x[0],x[1][0])).sortByKey()
 
 print(rdd.collect())

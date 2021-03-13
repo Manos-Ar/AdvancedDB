@@ -19,18 +19,6 @@ def mapper2(x):
     genre=tokens[1]
     return (_id,genre)
 
-def filter1(x):
-    genre = x[1][0]
-    if genre=="Drama":
-        return True
-    return False
-
-def map_distinct(x):
-    tokens=x.split(",")
-    # _id=int(tokens[0])
-    genre=tokens[1]
-    return (genre)
-
 spark = SparkSession.builder.appName("query3-rdd").getOrCreate()
 sc = spark.sparkContext
 
@@ -40,20 +28,19 @@ genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
 rating_t = rating.map(mapper1)
 genres_t = genres.map(mapper2)
 
-# distinct = genres.map(map_distinct).countByValue()
+join_genres_rating = genres_t.join(rating_t)
+print(join_genres_rating.first())
+# (id,(genre,rating))
 
 
-joined = genres_t.join(rating_t)
-distinct = joined.map(lambda x: (x[0],x[1][0])).distinct()
-# map(lambda x: x[1][0]).countByValue()
-print(distinct)
-# print(joined.take(30))
-# print(joined.count())
 
-# output = joined.map(lambda x: (x[1][0],x[0],x[1][1]))
-# .groupByKey().map()
-# .reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1]))
-# .map(lambda x: (x[0],x[1][0],x[1][1]/x[1][0]))
-# .reduceByKey(lambda x,y : x)
+mean_rating = join_genres_rating.map(lambda x: [x[1][0],[x[1][1],1]]).reduceByKey(lambda x,y: [x[0]+y[0],x[1]+y[1]]).map(lambda x: (x[0],x[1][0]/x[1][1]))
+# print(mean_rating.first())
 
-# print(output.take(25))
+
+distinct_genres_movies_count = join_genres_rating.map(lambda x: (x[1][0],x[0])).distinct().map(lambda x: (x[0],1)).reduceByKey(lambda x,y: x+y)
+# print(distinct_genres_movies_count.first())
+
+output = mean_rating.join(distinct_genres_movies_count).map(lambda x: (x[0],x[1][0],x[1][1]))
+
+print(output.collect())
