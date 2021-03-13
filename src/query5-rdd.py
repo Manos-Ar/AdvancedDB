@@ -79,7 +79,7 @@ max_rating = max_genre_user_count.join(join_ratings_genres_movies_format).map(la
 # (('Mystery', 8659), (994, 5.0, 'Straw Dogs', 239))
 
 max_rating_movie = max_rating.map(lambda x: (x[1][0],(x[0],x[1][1],x[1][2],x[1][3])))
-max_rating_movie = max_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1],x[1][0][2],x[1][0][3]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[0])).map(lambda x: (x[0],(x[1][1],x[1][2],x[1][2])))
+max_rating_movie = max_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1],x[1][0][2],x[1][0][3]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[0])).map(lambda x: (x[0],(x[1][1],x[1][2],x[1][3])))
 # (movie_id,(((genre,user_id),rating,title,count),popularity))
 # (8446, ((('Family', 45811), 5.0, 'Bugsy Malone', 198), 215))
 # ((genre,user_id),rating,title,count)
@@ -87,7 +87,7 @@ print(max_rating_movie.first())
 
 min_rating = max_genre_user_count.join(join_ratings_genres_movies_format).map(lambda x: (x[0],(x[1][1][0],x[1][1][1],x[1][1][2],x[1][0]))).reduceByKey(lambda x,y: min((x, y), key=lambda x: x[1]))
 min_rating_movie = min_rating.map(lambda x: (x[1][0],(x[0],x[1][1],x[1][2],x[1][3])))
-min_rating_movie = min_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1],x[1][0][2],x[1][0][3]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[0])).map(lambda x: (x[0],(x[1][1],x[1][2],x[1][2])))
+min_rating_movie = min_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1],x[1][0][2],x[1][0][3]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[0])).map(lambda x: (x[0],(x[1][1],x[1][2],x[1][3])))
 
 output = max_rating_movie.join(min_rating_movie)
 
