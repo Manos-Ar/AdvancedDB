@@ -46,7 +46,7 @@ def mapper1(x):
     # year = int(year)
     quinq = get_quinquennium(year)
     # return  (_id,(summary_len,quinq))
-    return  (_id,quinq,summary_len,1)
+    return  (_id,(quinq,summary_len,1))
 
 def mapper2(x):
     tokens=x.split(",")
@@ -71,7 +71,13 @@ genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
 movies_t = movies.map(split_complex).map(mapper1)
 genres_t = genres.map(mapper2).filter(filter1)
 
+#(16, (('2000-2004', 73, 1), 'Drama'))
+#(id, (dekaetia,word_count,1), genre)
 joined = movies_t.join(genres_t)
 
+#meta to map (dekaetia,word_count_ana_tainia,1)
+#meta to reduce (dekaetia,(sinoliko_word_count,sinolo_tainiwn))
+joined2 = joined.map(lambda x: (x[1][0][0],(x[1][0][1],x[1][0][2]))).reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1])).map(lambda x: (x[0],x[1][0]/x[1][1]))
+#
 #joined.reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1]])).map(lambda x: x[0]/x[1])
-print(joined.collect())
+print(joined2.take(10))
