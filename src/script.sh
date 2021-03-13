@@ -15,3 +15,5 @@ spark-submit /home/user/src/query4-sql.py
 spark-submit /home/user/src/query5-rdd.py
 spark-submit /home/user/src/query5-sql.py
 spark-submit /home/user/src/query5-sql-par.py
+
+python3 plots.py
