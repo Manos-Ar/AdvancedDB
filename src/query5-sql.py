@@ -141,4 +141,4 @@ temp15 = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_ti
                     using(genre,user_id,max_movie_id,min_movie_id)\
                     order by genre ASC")
 
-temp15.show(truncate=False)                
+temp15.show(30)                
