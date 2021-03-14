@@ -73,6 +73,7 @@ join_ratings_genres_movies_format = join_ratings_genres_movies.map(lambda x: ((x
 tmp_count = join_ratings_genres_movies_format.map(lambda x: (x[0],1)).reduceByKey(lambda x,y : x+y)
 
 max_genre_user_count = tmp_count.map(lambda x: (x[0][0],(x[0][1],x[1]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1])).distinct().map(lambda x: ((x[0],x[1][0]),x[1][1]))
+# ((genre,user_i),count)
 
 popularity = rating.map(lambda x: (x[0],1)).reduceByKey(lambda x,y : x+y)
 
