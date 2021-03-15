@@ -37,3 +37,7 @@ hadoop fs -ls hdfs://master:9000/movie_data
 ```
 hadoop fs -rm hdfs://master:9000/movie_data/<file-name>
 ```
+## Πρόβλημα μνήμης
+```
+ sudo sh -c 'echo 3 >/proc/sys/vm/drop_caches'
+```
