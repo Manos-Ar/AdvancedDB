@@ -5,7 +5,7 @@ from io import StringIO
 import csv
 import sys
 import time
-file = open('times.txt', 'a+')
+times = open('times.txt', 'w+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):
@@ -27,10 +27,9 @@ def genres_map(x):
 
 
 def movies_map(x):
-    tokens = x.split(",")
-    movie_id = int(tokens[0])
+    movie_id = int(x[0])
     # title = tokens[1]
-    popularity = float(tokens[7])
+    popularity = float(x[7])
     return (movie_id,popularity)
 
 def final_map(x):
@@ -58,55 +57,62 @@ start_time = time.time()
 
 rating = rating.map(rating_map)
 genres = genres.map(genres_map)
-# movies = movies.map(movies_map)
+_movies = movies.map(split_complex)
+movies_popularity  = _movies.map(movies_map)
+movies_title  = _movies.map(lambda x: (int(x[0]),x[1]))
+
+
 
 
 
 join_ratings_genres = genres.join(rating).map(lambda x : (x[0],(x[1][0],x[1][1][0],x[1][1][1])))
 
 print(join_ratings_genres.first())
+# (movie_id,(genre, user_id,rating))
 
-# join_ratings_genres_movies = join_ratings_genres.join(movies)
+movies_popularity  = _movies.map(movies_map)
+join_ratings_genres_movies = join_ratings_genres.join(movies_popularity).map(lambda x: ((x[1][0][0],x[1][0][1]),(x[0],x[1][0][2],x[1][1])))
 
-# # print(join_ratings_genres_movies.first())
-# # (15, (('Mystery', 225, 3.0), 'Citizen Kane'))
+print(join_ratings_genres_movies.first())
+# # ((genre,user_i),(movie_id,rating,popularity))
 
-# join_ratings_genres_movies_format = join_ratings_genres_movies.map(lambda x: ((x[1][0][0],x[1][0][1]),(x[0],x[1][0][2],x[1][1])))
-# # ((genre,user_i),(movie_id,rating,title))
+count_users = join_ratings_genres_movies.map(lambda x: (x[0],1)).reduceByKey(lambda x,y : x+y).map(lambda x: (x[0][0],(x[0][1],x[1]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1])).distinct().map(lambda x: ((x[0],x[1][0]),x[1][1]))
+# ((genre,user_id),count)
 
-# tmp_count = join_ratings_genres_movies_format.map(lambda x: (x[0],1)).reduceByKey(lambda x,y : x+y)
 
-# max_genre_user_count = tmp_count.map(lambda x: (x[0][0],(x[0][1],x[1]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1])).distinct().map(lambda x: ((x[0],x[1][0]),x[1][1]))
-# # ((genre,user_i),count)
+join_ratings_genres_movies_count = join_ratings_genres_movies.join(count_users).map(lambda x: (x[0][0],(x[0][1],x[1][0][0],x[1][0][1],x[1][0][2],x[1][1])))
+print(join_ratings_genres_movies_count.first())
+# (genre,(user_id,movie_id,rating,popularity,count))
 
-# popularity = rating.map(lambda x: (x[0],1)).reduceByKey(lambda x,y : x+y)
 
-# max_rating = max_genre_user_count.join(join_ratings_genres_movies_format).map(lambda x: (x[0],(x[1][1][0],x[1][1][1],x[1][1][2],x[1][0]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1]))
-# # ((genre,user_id),(movie_id,rating,title,count))
-# # (('Mystery', 8659), (994, 5.0, 'Straw Dogs', 239))
+max_rating = join_ratings_genres_movies_count.reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2])).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2]))
+min_rating = join_ratings_genres_movies_count.reduceByKey(lambda x,y: min((x, y), key=lambda x: x[2])).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2])) 
+# (genre,(user_id,movie_id,rating,popularity,count))
 
-# max_rating_movie = max_rating.map(lambda x: (x[1][0],(x[0],x[1][1],x[1][2],x[1][3])))
-# max_rating_movie = max_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1],x[1][0][2],x[1][0][3]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[0])).map(lambda x: (x[0],(x[1][1],x[1][2],x[1][3])))
-# # (movie_id,(((genre,user_id),rating,title,count),popularity))
-# # (8446, ((('Family', 45811), 5.0, 'Bugsy Malone', 198), 215))
-# # ((genre,user_id),rating,title,count)
-# #print(max_rating_movie.first())
 
-# min_rating = max_genre_user_count.join(join_ratings_genres_movies_format).map(lambda x: (x[0],(x[1][1][0],x[1][1][1],x[1][1][2],x[1][0]))).reduceByKey(lambda x,y: min((x, y), key=lambda x: x[1]))
-# min_rating_movie = min_rating.map(lambda x: (x[1][0],(x[0],x[1][1],x[1][2],x[1][3])))
-# min_rating_movie = min_rating_movie.join(popularity).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1],x[1][0][2],x[1][0][3]))).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[0])).map(lambda x: (x[0],(x[1][1],x[1][2],x[1][3])))
+movies_title  = _movies.map(lambda x: (int(x[0]),x[1]))
+max_rating_title = max_rating.map(lambda x: (x[1][1],(x[0],x[1][0],x[1][2],x[1][4]))).join(movies_title).map(lambda x: (x[1][0][0],(x[1][0][1],x[1][1],x[1][0][2],x[1][0][3])))
+min_rating_title = min_rating.map(lambda x: (x[1][1],(x[0],x[1][2]))).join(movies_title).map(lambda x: (x[1][0][0],(x[1][1],x[1][0][1])))
+# (genre,(user_id,title,rating,count))
+# (genre,(title,rating))
 
-# output = max_rating_movie.join(min_rating_movie)
+output = max_rating_title.join(min_rating_title).map(lambda x: (x[0],x[1][0][0],x[1][0][1],x[1][0][2],x[1][1][0],x[1][1][1],x[1][0][3]))
 
-# #print(output.first())
-# output = output.map(final_map)
+# print(max_rating_title.collect())
+# print(min_rating_title.collect())
+end_time = time.time()
+times.write("Query5-rdd: "+str((end_time-start_time)/60)+'\n')
+output_list = output.collect()
 
-# # print(join_ratings_genres_movies_format.first())
-# # print(max_rating.first())
-# # print(max_rating_movie.first())
-# end_time = time.time()
+output_file = open("5_rdd.txt", "w+")
 
-# file.write(str((end_time-start_time)/60)+'\n')
+output_file.write("Genre\tUser\tTitle_Max\tRating_max\tTitle_Min\tRating_Min\tCount\n")
 
-# print(output.collect())
-# file.close()
+for line in output_list:
+    for l in line:
+        output_file.write("%s\t" %l)
+    output_file.write("\n")
+
+output_file.close()
+times.close()
+
