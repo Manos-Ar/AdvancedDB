@@ -28,4 +28,5 @@ for i in range(5):
     ax = fig.add_subplot(111)
     ax.set_title('Q{}'.format(i+1))
     ax.bar(labels,temp)
-    plt.savefig("Q{}_time_plot".format(i))
+    #plt.savefig("Q{}_time_plot".format(i))
+    plt.show()

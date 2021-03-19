@@ -1,8 +1,7 @@
 #!/bin/python3
 
-import pandas
+import pandas as pd
 
-df = pd.read_csv('hdfs://master:9000/movie_data/movies.csv',nrows= 100)
+df = pd.read_csv('movies.csv',nrows= 99)
 
-df.to_csv('home/user/src/movies_100.csv',index=False)
-
+df.to_csv('movies_100.csv',index=False)
