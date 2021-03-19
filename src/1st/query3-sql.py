@@ -7,7 +7,7 @@ import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
 spark = SparkSession.builder.appName("query3-sql").getOrCreate()
 
 ratings_csv = spark.read.csv('hdfs://master:9000/movie_data/ratings.csv',inferSchema='true')
@@ -30,7 +30,7 @@ spark.sql(" select genres, count(distinct id) as total, avg(rating) as mean_rati
             group by genres").show()
 end_time = time.time()
 
-file.write(str((end_time-start_time)/60)+'\n')
+times.write("Query3-sql-csv: "+str((end_time-start_time)/60)+'\n')
 
 ratings_parquet = spark.read.load('hdfs://master:9000/movie_data/ratings.parquet')
 movies_genres_parquet = spark.read.load('hdfs://master:9000/movie_data/movie_genres.parquet')
@@ -50,6 +50,5 @@ spark.sql(" select genres, count(distinct id) as total, avg(rating) as mean_rati
             group by genres").show()
 end_time = time.time()
 
-file.write(str((end_time-start_time)/60)+'\n')
-
-file.close()
+times.write("Query3-sql-parquet: "+str((end_time-start_time)/60)+'\n')
+times.close()

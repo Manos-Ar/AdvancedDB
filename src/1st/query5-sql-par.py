@@ -5,8 +5,7 @@ from io import StringIO
 import csv
 import sys
 import time
-file = open('times.txt', 'a+')
-
+times = open('times.txt', 'a+')
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
@@ -136,7 +135,7 @@ temp14 = spark.sql("select genre,user_id,max_movie_temp.movie_id as max_movie_id
 
 temp14.registerTempTable("join_popularity")
 
-final = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_title,min_rating,max_count as number_of_reviews\
+output = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_title,min_rating,max_count as number_of_reviews\
                     from\
                     temp6\
                     join\
@@ -145,9 +144,9 @@ final = spark.sql("select genre,user_id,max_movie_title,max_rating,min_movie_tit
                     order by genre ASC")
 end_time = time.time()
 
-file.write(str((end_time-start_time)/60)+'\n')
+output.show(30)
 
-file.close()
-final.show(truncate = False)
+times.write("Query5-sql-parquet: "+str((end_time-start_time)/60)+'\n')
+times.close()
 
 # final.coalesce(1).write.format('csv').save("/home/user/src/q5_output_sql.txt",header='true')

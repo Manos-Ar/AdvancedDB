@@ -5,7 +5,7 @@ from io import StringIO
 import csv
 import sys
 import time
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
 
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
@@ -226,6 +226,10 @@ output = spark.sql( """
                         max_rating_title as mx
                         using(genre)
                     """)
-
+end_time = time.time()
 output.show(30)
+
+times.write("Query5-sql-csv: "+str((end_time-start_time)/60)+'\n')
+times.close()
+
 

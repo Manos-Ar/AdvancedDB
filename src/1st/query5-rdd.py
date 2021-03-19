@@ -5,7 +5,7 @@ from io import StringIO
 import csv
 import sys
 import time
-times = open('times.txt', 'w+')
+times = open('times.txt', 'a+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):

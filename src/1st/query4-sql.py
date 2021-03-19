@@ -7,7 +7,8 @@ import sys
 import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
+
 spark = SparkSession.builder.appName("query4-sql").getOrCreate()
 
 def count_review_words(x):
@@ -62,7 +63,7 @@ spark.sql(" select quinq, avg(summary_words) as average_summary\
             group by quinq").show()
 end_time = time.time()
 
-file.write(str((end_time-start_time)/60)+'\n')
+times.write("Query4-sql-csv: "+str((end_time-start_time)/60)+'\n')
 
 
 movies_genres_parquet = spark.read.load('hdfs://master:9000/movie_data/movie_genres.parquet')
@@ -87,6 +88,6 @@ spark.sql(" select quinq, avg(summary_words) as average_summary\
             group by quinq").show()
 end_time = time.time()
 
-file.write(str((end_time-start_time)/60)+'\n')
+times.write("Query4-sql-parquet: "+str((end_time-start_time)/60)+'\n')
+times.close()
 
-file.close()

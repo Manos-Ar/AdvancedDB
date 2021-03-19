@@ -6,7 +6,7 @@ import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
 
 def mapper1(x):
     tokens=x.split(",")
@@ -30,7 +30,7 @@ rating_t = rating.map(mapper1)
 genres_t = genres.map(mapper2)
 
 join_genres_rating = genres_t.join(rating_t)
-print(join_genres_rating.first())
+# print(join_genres_rating.first())
 # (id,(genre,rating))
 
 
@@ -44,6 +44,18 @@ distinct_genres_movies_count = join_genres_rating.map(lambda x: (x[1][0],x[0])).
 
 output = mean_rating.join(distinct_genres_movies_count).map(lambda x: (x[0],x[1][0],x[1][1]))
 end_time = time.time()
-file.write(str((end_time-start_time)/60)+'\n')
-file.close()
-print(output.collect())
+
+times.write("Query3-rdd: "+str((end_time-start_time)/60)+'\n')
+
+output_file = open("3_rdd.txt", "w+")
+output_file.write("Genre\tMean\tTotal\n")
+
+output_list = output.collect()
+
+for line in output_list:
+    for l in line:
+        output_file.write("%s\t" %l)
+    output_file.write("\n")
+
+output_file.close()
+times.close()

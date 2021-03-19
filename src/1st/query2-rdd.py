@@ -6,7 +6,7 @@ import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
 
 def mapper1(x):
     tokens=x.split(",")
@@ -34,11 +34,18 @@ rdd_some = rdd.map(mapper1).reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1])).map(m
 
 rdd_total = rdd.map(mapper3).reduceByKey(lambda x,y: 0).map(lambda x: (1,1)).reduceByKey(lambda x,y: x+y)
 end_time = time.time()
-file.write(str((end_time-start_time)/60)+'\n')
+
+times.write("Query2-rdd: "+str((end_time-start_time)/60)+'\n')
+
+
 some=rdd_some.collect()[0][1]
 total=rdd_total.collect()[0][1]
-print("Some users:"+str(some))
-print("Total users:"+str(total))
-print("Percentage:"+str(some/total))
-print(rdd.take(10))
-file.close()
+# print("Some users:"+str(some))
+# print("Total users:"+str(total))
+# print("Percentage:"+str(some/total))
+output_file = open("2_rdd.txt", "w+")
+output_file.write("Precentage: "+str(some/total)+"\n")
+
+# print(rdd.take(10))
+times.close()
+output_file.close()

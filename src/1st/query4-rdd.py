@@ -8,7 +8,7 @@ import re
 import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
 def split_complex(x):
     return list(csv.reader(StringIO(x), delimiter=','))[0]
 
@@ -78,10 +78,22 @@ joined = movies_t.join(genres_t)
 
 #meta to map (dekaetia,word_count_ana_tainia,1)
 #meta to reduce (dekaetia,(sinoliko_word_count,sinolo_tainiwn))
-joined2 = joined.map(lambda x: (x[1][0][0],(x[1][0][1],x[1][0][2]))).reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1])).map(lambda x: (x[0],x[1][0]/x[1][1]))
+output = joined.map(lambda x: (x[1][0][0],(x[1][0][1],x[1][0][2]))).reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1])).map(lambda x: (x[0],x[1][0]/x[1][1]))
 end_time = time.time()
-file.write(str((end_time-start_time)/60)+'\n')
-#
+
+times.write("Query4-rdd: "+str((end_time-start_time)/60)+'\n')
+
 #joined.reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1]])).map(lambda x: x[0]/x[1])
-print(joined2.take(10))
-file.close()
+# print(joined2.take(10))
+output_file = open("4_rdd.txt", "w+")
+output_file.write("Year_Range\tMean\n")
+
+output_list = output.collect()
+
+for line in output_list:
+    for l in line:
+        output_file.write("%s\t" %l)
+    output_file.write("\n")
+
+output_file.close()
+times.close()

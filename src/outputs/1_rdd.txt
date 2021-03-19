@@ -1,0 +1,19 @@
+Year	Movie
+2000	Billy Elliot	
+2001	千と千尋の神隠し	
+2002	My Big Fat Greek Wedding	
+2003	Tarnation	
+2004	Super Size Me	
+2005	웰컴 투 동막골	
+2006	Facing the Giants	
+2007	Paranormal Activity	
+2008	Fireproof	
+2009	The Collector	
+2010	Catfish	
+2011	From Prada to Nada	
+2012	Aquí Entre Nos	
+2013	Nurse 3-D	
+2014	The Quiet Ones	
+2015	대호	
+2016	Split	
+2017	A Ghost Story	

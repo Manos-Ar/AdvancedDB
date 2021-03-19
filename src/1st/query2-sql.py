@@ -7,7 +7,7 @@ import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-file = open('times.txt', 'a+')
+times = open('times.txt', 'a+')
 spark = SparkSession.builder.appName("query2-sql").getOrCreate()
 
 df_csv = spark.read.csv('hdfs://master:9000/movie_data/ratings.csv',inferSchema='true')
@@ -23,7 +23,8 @@ spark.sql(" select count(distinct id)/(select count(distinct(_c0)) from ratings_
             group by id)\
             where rating>3.0").show()
 end_time = time.time()
-file.write(str((end_time-start_time)/60)+'\n')
+
+times.write("Query2-sql-csv: "+str((end_time-start_time)/60)+'\n')
 
 df_parquet = spark.read.load('hdfs://master:9000/movie_data/ratings.parquet')
 
@@ -36,5 +37,6 @@ spark.sql(" select count(distinct id)/(select count(distinct(_c0)) from ratings_
             group by id)\
             where rating>3.0").show()
 end_time = time.time()
-file.write(str((end_time-start_time)/60)+'\n')
-file.close()
+
+times.write("Query2-sql-parquet: "+str((end_time-start_time)/60)+'\n')
+times.close()
