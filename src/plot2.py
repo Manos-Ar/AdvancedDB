@@ -10,7 +10,8 @@ times=[]
 with open('outputs/times_2nd.txt') as file:
     for line in file:
         tokens=line.split()
-        time = float(tokens[1])*60
+        print(tokens)
+        time = float(tokens[1])
         times.append(time)
 
 print(times)
@@ -40,7 +41,7 @@ times=[]
 with open('outputs/times_2nd_sql.txt') as file:
     for line in file:
         tokens=line.split()
-        time = float(tokens[2])*60
+        time = float(tokens[2])
         times.append(time)
 
 print(times)

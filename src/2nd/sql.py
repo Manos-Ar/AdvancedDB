@@ -18,7 +18,7 @@ else:
 
 df = spark.read.format("parquet")
 df1 = df.load('hdfs://master:9000/movie_data/ratings.parquet')
-df2 = df.load('hdfs://master:9000/movie_data/movies.parquet')
+df2 = df.load('hdfs://master:9000/movie_data/movie_genres.parquet')
 df1.registerTempTable("ratings")
 df2.registerTempTable("movie_genres")
 sqlString = \

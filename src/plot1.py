@@ -7,7 +7,7 @@ labels = ['RDD', 'SQL-CSV', 'SQL-PAR']
 times={}
 
 
-with open('outputs/times.txt') as file:
+with open('outputs/times_1st.txt') as file:
     for line in file:
         tokens=line.split()
         time = float(tokens[1])*60

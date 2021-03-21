@@ -9,12 +9,11 @@ import time
 times = open('times_2nd.txt', 'w+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
-def split_complex(x):
-    return list(csv.reader(StringIO(x), delimiter=','))[0]
-
-def map_movie(x):
-    movie_id = int(x[0])
-    return (movie_id,("m",(x[1],x[2],x[3],x[4],x[5],x[6],x[7])))
+def map_genre(x):
+    tokens=x.split(",")
+    _id=int(tokens[0])
+    genre=tokens[1]
+    return (_id,("g",genre))
 
 def map_rating(x):
     tokens = x.split(",")
@@ -56,36 +55,35 @@ def map_output(x):
     if list_ratings==[] or list_movies==[]:
         return []
     else:
-        return ((movie_id, i, j) for i, j in product(list_ratings, list_movies))
+        return ((movie_id, j, i[0],i[1],i[2]) for i, j in product(list_ratings, list_movies))
 
 
 spark = SparkSession.builder.appName("repartition-join").getOrCreate()
 sc = spark.sparkContext
 start_time = time.time()
-movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
+genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 
-movies = sc.parallelize(movies.map(split_complex).map(map_movie).take(100))
+movies = sc.parallelize(genres.map(map_genre).take(100))
 
 rating = rating.map(map_rating)
 
 output = rating.union(movies).map(map_list).reduceByKey(reducer).flatMap(map_output)
 
 end_time = time.time()
-times.write("Repartition: "+str((end_time-start_time)/60)+'\n')
+times.write("Repartition: "+str(end_time-start_time)+'\n')
 output_list = output.collect()
 
 print(output_list)
 
+output_file = open("Repartition.txt", "w+")
+
+output_file.write("Movie_id\tGenre\tUser_id\tRating\tTimestamp\n")
+
+for line in output_list:
+    for l in line:
+        output_file.write("%s\t" %l)
+    output_file.write("\n")
+
+output_file.close()
 times.close()
-
-# output_file = open("Repartition.txt", "w+")
-
-# output_file.write("Movie_id\tRating\tMovies\n")
-
-# for line in output_list:
-#     for l in line:
-#         output_file.write("%s\t" %l)
-#     output_file.write("\n")
-
-# output_file.close()

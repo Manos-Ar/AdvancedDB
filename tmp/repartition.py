@@ -6,14 +6,15 @@ from itertools import product
 import csv
 import sys
 import time
-times = open('times_2nd.txt', 'a+')
+times = open('times_2nd.txt', 'w+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
-def map_genre(x):
-    tokens=x.split(",")
-    _id=int(tokens[0])
-    genre=tokens[1]
-    return (_id,("g",genre))
+def split_complex(x):
+    return list(csv.reader(StringIO(x), delimiter=','))[0]
+
+def map_movie(x):
+    movie_id = int(x[0])
+    return (movie_id,("m",(x[1],x[2],x[3],x[4],x[5],x[6],x[7])))
 
 def map_rating(x):
     tokens = x.split(",")
@@ -61,17 +62,17 @@ def map_output(x):
 spark = SparkSession.builder.appName("repartition-join").getOrCreate()
 sc = spark.sparkContext
 start_time = time.time()
-genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres_100.csv')
+movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 
-movies = sc.parallelize(genres.map(map_genre).collect())
+movies = sc.parallelize(movies.map(split_complex).map(map_movie).take(100))
 
 rating = rating.map(map_rating)
 
 output = rating.union(movies).map(map_list).reduceByKey(reducer).flatMap(map_output)
 
 end_time = time.time()
-times.write("Repartition-100: "+str(end_time-start_time)+'\n')
+times.write("Repartition: "+str((end_time-start_time)/60)+'\n')
 output_list = output.collect()
 
 print(output_list)
