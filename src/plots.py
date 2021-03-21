@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import matplotlib.pyplot as plt
 
 labels = ['RDD', 'SQL-CSV', 'SQL-PAR']
@@ -6,7 +8,7 @@ sql_csv = []
 sql_par = []
 
 i=0
-with open('times.txt') as file:
+with open('outputs/times.txt') as file:
     for line in file:
         if(i==0):
             rdd.append(eval(line))
@@ -29,4 +31,6 @@ for i in range(5):
     ax.set_title('Q{}'.format(i+1))
     ax.bar(labels,temp)
     #plt.savefig("Q{}_time_plot".format(i))
-    plt.show()
+    # plt.show()
+    plt.savefig("plot_times.png",bbox_inches="tight")
+

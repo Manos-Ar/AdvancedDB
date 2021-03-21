@@ -1,0 +1,78 @@
+
+map(x):     #rating
+    emit(movie_id, user_id, rating)
+
+map(x):     #movie_genre
+    emit((movie_id, genre))
+
+map(x):     #movie_popularity_title
+    emit(movie_id,popularity,title)
+
+join(rating,movie_genre)        #rating_genre
+
+map(x):     
+    emit(movie_id,(genre, user_id,rating))
+
+join(rating_genre,movie_popularity_title)        
+
+map(x):     #rat_gen_pop
+    emit((genre,user_i),(movie_id,rating,popularity,title))
+
+map(x):     #count_users
+    emit((genre,user_id),1)
+
+reduce(key,values):
+    count=0
+    for value in values:
+        count+=value
+    emit(key,count)
+
+map(x):
+    emit(genre,(user_id,count))
+
+reduce(key,values):
+    max_count=0
+    for value in values:
+        max_count=max(max_count,count)
+    emit max_count
+
+distict()
+
+map(x):     #count_users
+    emit((genre,user_id),count)
+
+join(rat_gen_pop, count_users)
+
+map(x):     #join_ratings_genres_movies_count
+    emit(genre,(user_id,movie_id,rating,popularity,title,count))
+
+
+reduce(key,values):
+    max_rating=values[0]
+    for value in values:
+        max_rating=max((max_rating, value), key=rating)
+    emit max_rating
+
+reduce(key, values):        #max_rating
+    max_popularity=values[0]
+    for value in values:
+        max_popularity=max((max_popularity, value), key=popularity)
+    emit max_popularity
+
+---------
+
+reduce(key,values):
+    min_rating=values[0]
+    for value in values:
+        min_rating=max((min_rating, value), key=rating)
+    emit min_rating
+
+reduce(key, values):        #min_rating
+    min_popularity=values[0]
+    for value in values:
+        min_popularity=max((min_popularity, value), key=popularity)
+    emit min_popularity
+
+
+join(min_rating,max_rating):
+    emit(genre,user_id,max_title,max_rating,min_title,min_rating,count)

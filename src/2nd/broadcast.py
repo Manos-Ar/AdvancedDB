@@ -5,7 +5,7 @@ from io import StringIO
 import csv
 import sys
 import time
-file = open('times.txt', 'a+')
+times = open('times_2nd.txt', 'a+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):
@@ -33,19 +33,35 @@ def filter_keys(x):
 
 def join_broadcast(x):
     movie_id = x[0]
-    return(movie_id,br.value[movie_id][0],br.value[movie_id][1],br.value[movie_id][2],br.value[movie_id][3],br.value[movie_id][4],br.value[movie_id][5],br.value[movie_id][6],x[1][0],x[1][1],x[1][2])
+    return(movie_id,(br.value[movie_id][0],br.value[movie_id][1],br.value[movie_id][2],br.value[movie_id][3],br.value[movie_id][4],br.value[movie_id][5],br.value[movie_id][6]),(x[1][0],x[1][1],x[1][2]))
     # x[1],br.value[movie_id])
 
-spark = SparkSession.builder.appName("query1-rdd").getOrCreate()
+spark = SparkSession.builder.appName("Broadcast").getOrCreate()
 sc = spark.sparkContext
 
 movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 
+start_time = time.time()
 br = sc.broadcast(dict(movies.map(split_complex).map(map_movie).take(100)))
 
 rating = rating.map(map_rating)
 
-join_ratings_movies = rating.filter(filter_keys).map(join_broadcast)
+output = rating.filter(filter_keys).map(join_broadcast)
 
-print(join_ratings_movies.first())
+end_time = time.time()
+times.write("Broadcast: "+str((end_time-start_time)/60)+'\n')
+output_list = output.collect()
+print(output_list)
+
+# output_file = open("Broadcast.txt", "w+")
+
+# output_file.write("Movie_id\tMovies\tRating\n")
+
+# for line in output_list:
+#     for l in line:
+#         output_file.write("%s\t" %l)
+#     output_file.write("\n")
+
+# output_file.close()
+# times.close()
