@@ -8,6 +8,7 @@ else
 fi
 
 
-./plot.py
+./plot1.py
+./plot2.py
 
 mv *.png plots

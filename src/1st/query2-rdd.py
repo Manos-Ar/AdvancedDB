@@ -6,7 +6,7 @@ import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-times = open('times.txt', 'a+')
+times = open('times2.txt', 'a+')
 
 def mapper1(x):
     tokens=x.split(",")
@@ -27,9 +27,10 @@ def mapper3(x):
 
 spark = SparkSession.builder.appName("query1-rdd").getOrCreate()
 sc = spark.sparkContext
+start_time = time.time()
+
 
 rdd = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
-start_time = time.time()
 rdd_some = rdd.map(mapper1).reduceByKey(lambda x,y: (x[0]+y[0],x[1]+y[1])).map(mapper2).filter(lambda x: x[1]>3.0).map(lambda x: (1,1)).reduceByKey(lambda x,y: x+y)
 
 rdd_total = rdd.map(mapper3).reduceByKey(lambda x,y: 0).map(lambda x: (1,1)).reduceByKey(lambda x,y: x+y)

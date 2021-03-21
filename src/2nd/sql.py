@@ -2,6 +2,12 @@ from pyspark.sql import SparkSession
 import sys, time
 disabled = sys.argv[1]
 
+if disabled=="Y":
+    times = open('times_2nd_sql.txt', 'w+')
+else:
+    times = open('times_2nd_sql.txt', 'a+')
+
+
 spark = SparkSession.builder.appName('query1-sql').getOrCreate()
 if disabled == "Y":
     spark.conf.set("spark.sql.autoBroadcastJoinThreshold", -1)
@@ -28,5 +34,8 @@ spark.sql(sqlString).show()
 t2 = time.time()
 
 spark.sql(sqlString).explain()
+
+times.write("Sql-"+disabled+" : " +str((t2-t1)/60)+'\n')
+
 print("Time with choosing join type %s is %.4f sec."%("enabled" if
 disabled == 'N' else "disabled", t2-t1))

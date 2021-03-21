@@ -7,7 +7,7 @@ import sys
 import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-times = open('times.txt', 'a+')
+times = open('times2.txt', 'a+')
 
 spark = SparkSession.builder.appName("query4-sql").getOrCreate()
 
@@ -38,6 +38,7 @@ def get_quinquennium(x):
 spark.udf.register("countWords", count_review_words)
 spark.udf.register("quinquennium",get_quinquennium)
 
+start_time = time.time()
 
 movies_genres_csv = spark.read.csv('hdfs://master:9000/movie_data/movie_genres.csv',inferSchema='true')
 movies_data_csv = spark.read.csv('hdfs://master:9000/movie_data/movies.csv',inferSchema='true')
@@ -47,7 +48,6 @@ movies_data_csv.printSchema()
 
 movies_genres_csv.registerTempTable("movies_genres_csv")
 movies_data_csv.registerTempTable("movies_csv")
-start_time = time.time()
 spark.sql(" select quinq, avg(summary_words) as average_summary\
             from(\
             select title, genre, countWords(summary) as summary_words, quinquennium(year) as quinq \
@@ -65,6 +65,7 @@ end_time = time.time()
 
 times.write("Query4-sql-csv: "+str((end_time-start_time)/60)+'\n')
 
+start_time = time.time()
 
 movies_genres_parquet = spark.read.load('hdfs://master:9000/movie_data/movie_genres.parquet')
 movies_data_parquet = spark.read.load('hdfs://master:9000/movie_data/movies.parquet')
@@ -72,7 +73,6 @@ movies_data_parquet = spark.read.load('hdfs://master:9000/movie_data/movies.parq
 movies_genres_parquet.registerTempTable("movies_genres_parquet")
 movies_data_parquet.registerTempTable("movies_data_parquet")
 
-start_time = time.time()
 spark.sql(" select quinq, avg(summary_words) as average_summary\
             from(\
             select title, genre, countWords(summary) as summary_words, quinquennium(year) as quinq \

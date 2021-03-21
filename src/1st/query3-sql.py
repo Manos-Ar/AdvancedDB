@@ -7,8 +7,10 @@ import time
 import sys
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-times = open('times.txt', 'a+')
+times = open('times2.txt', 'a+')
 spark = SparkSession.builder.appName("query3-sql").getOrCreate()
+
+start_time = time.time()
 
 ratings_csv = spark.read.csv('hdfs://master:9000/movie_data/ratings.csv',inferSchema='true')
 movies_genres_csv = spark.read.csv('hdfs://master:9000/movie_data/movie_genres.csv',inferSchema='true')
@@ -18,7 +20,6 @@ movies_genres_csv.registerTempTable("movies_genres_csv")
 
 ratings_csv.printSchema()
 movies_genres_csv.printSchema()
-start_time = time.time()
 spark.sql(" select genres, count(distinct id) as total, avg(rating) as mean_rating\
              from \
             (select _c0 as id, _c1 as genres \
@@ -32,13 +33,14 @@ end_time = time.time()
 
 times.write("Query3-sql-csv: "+str((end_time-start_time)/60)+'\n')
 
+start_time = time.time()
+
 ratings_parquet = spark.read.load('hdfs://master:9000/movie_data/ratings.parquet')
 movies_genres_parquet = spark.read.load('hdfs://master:9000/movie_data/movie_genres.parquet')
 
 ratings_csv.registerTempTable("ratings_parquet")
 movies_genres_csv.registerTempTable("movies_genres_parquet")
 
-start_time = time.time()
 spark.sql(" select genres, count(distinct id) as total, avg(rating) as mean_rating\
              from \
             (select _c0 as id, _c1 as genres \

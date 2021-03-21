@@ -7,7 +7,7 @@ import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
-times = open('times.txt', 'w+')
+times = open('times2.txt', 'w+')
 
 
 def split_complex(x):
@@ -31,12 +31,12 @@ def filter1(x):
 
 spark = SparkSession.builder.appName("query1-rdd").getOrCreate()
 sc = spark.sparkContext
+start_time = time.time()
 
 rdd = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 
 # print(rdd.take(10))
 
-start_time = time.time()
 output = rdd.map(split_complex).filter(filter1).map(mapper1).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[1])).map(lambda x:(x[0],x[1][0])).sortByKey()
 
 end_time = time.time()

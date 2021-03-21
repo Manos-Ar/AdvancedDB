@@ -5,7 +5,7 @@ from io import StringIO
 import csv
 import sys
 import time
-times = open('times.txt', 'a+')
+times = open('times2.txt', 'a+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):
@@ -50,10 +50,11 @@ def final_map(x):
 spark = SparkSession.builder.appName("query5-rdd").getOrCreate()
 sc = spark.sparkContext
 
+start_time = time.time()
+
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
 movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
-start_time = time.time()
 
 rating = rating.map(rating_map)
 genres = genres.map(genres_map)
@@ -96,7 +97,7 @@ min_rating_title = min_rating.map(lambda x: (x[1][1],(x[0],x[1][2]))).join(movie
 # (genre,(user_id,title,rating,count))
 # (genre,(title,rating))
 
-output = max_rating_title.join(min_rating_title).map(lambda x: (x[0],x[1][0][0],x[1][0][1],x[1][0][2],x[1][1][0],x[1][1][1],x[1][0][3]))
+output = max_rating_title.join(min_rating_title).sortByKey().map(lambda x: (x[0],x[1][0][0],x[1][0][1],x[1][0][2],x[1][1][0],x[1][1][1],x[1][0][3]))
 
 # print(max_rating_title.collect())
 # print(min_rating_title.collect())

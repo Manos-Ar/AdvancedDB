@@ -5,12 +5,14 @@ from io import StringIO
 import csv
 import sys
 import time
-times = open('times.txt', 'a+')
+times = open('times2.txt', 'a+')
 
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 spark = SparkSession.builder.appName("query5-sql").getOrCreate()
+
+start_time = time.time()
 
 genres_csv = spark.read.csv('hdfs://master:9000/movie_data/movie_genres.csv',inferSchema='true')
 movies_csv = spark.read.csv('hdfs://master:9000/movie_data/movies.csv',inferSchema='true')
@@ -23,7 +25,6 @@ ratings_csv = spark.read.csv('hdfs://master:9000/movie_data/ratings.csv',inferSc
 genres_csv.registerTempTable("genres")
 movies_csv.registerTempTable("movies")
 ratings_csv.registerTempTable("ratings")
-start_time = time.time()
 join_genres_rating = spark.sql("""  select movie_id,genre,user_id,rating
                                     from
                                     (select _c0 as user_id, _c1 as movie_id, _c2 as rating

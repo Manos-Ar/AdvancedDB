@@ -38,11 +38,11 @@ def join_broadcast(x):
 
 spark = SparkSession.builder.appName("Broadcast").getOrCreate()
 sc = spark.sparkContext
+start_time = time.time()
 
 movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 
-start_time = time.time()
 br = sc.broadcast(dict(movies.map(split_complex).map(map_movie).take(100)))
 
 rating = rating.map(map_rating)

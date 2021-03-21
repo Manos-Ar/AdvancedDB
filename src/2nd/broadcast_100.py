@@ -5,7 +5,8 @@ from io import StringIO
 import csv
 import sys
 import time
-file = open('times.txt', 'a+')
+times = open('times_2nd.txt', 'a+')
+
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):
@@ -38,6 +39,7 @@ def join_broadcast(x):
 
 spark = SparkSession.builder.appName("broadcast-100").getOrCreate()
 sc = spark.sparkContext
+start_time = time.time()
 
 movies = sc.textFile('hdfs://master:9000/movie_data/movies_100.csv')
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
@@ -47,5 +49,8 @@ br = sc.broadcast(dict(movies.map(split_complex).map(map_movie).collect()))
 rating = rating.map(map_rating)
 
 join_ratings_movies = rating.filter(filter_keys).map(join_broadcast)
+end_time = time.time()
 
-print(join_ratings_movies.first())
+times.write("Broadcast_100: "+str((end_time-start_time)/60)+'\n')
+
+print(join_ratings_movies.collect())

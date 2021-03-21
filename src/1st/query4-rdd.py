@@ -8,7 +8,7 @@ import re
 import time
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
-times = open('times.txt', 'a+')
+times = open('times2.txt', 'a+')
 def split_complex(x):
     return list(csv.reader(StringIO(x), delimiter=','))[0]
 
@@ -65,10 +65,11 @@ def filter1(x):
 spark = SparkSession.builder.appName("query4-rdd").getOrCreate()
 sc = spark.sparkContext
 
+start_time = time.time()
+
 
 movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
 genres = sc.textFile('hdfs://master:9000/movie_data/movie_genres.csv')
-start_time = time.time()
 movies_t = movies.map(split_complex).map(mapper1)
 genres_t = genres.map(mapper2).filter(filter1)
 

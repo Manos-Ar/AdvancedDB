@@ -1,21 +1,21 @@
 Genre	User	Title_Max	Rating_max	Title_Min	Rating_Min	Count
-Adventure	8659	Le Bossu	4.5	The Day After Tomorrow	2.0	369	
-Horror	45811	X: The Unknown	5.0	Outpost	0.5	350	
 Action	8659	Hulk	5.0	The Day After Tomorrow	2.0	588	
-Romance	45811	Ivanhoe	5.0	There's Something About Mary	0.5	586	
-Crime	8659	Young and Innocent	5.0	36 Quai des Orfèvres	2.0	476	
-History	45811	Gunner Palace	5.0	The Great Escape	0.5	155	
-Foreign	45811	Dreams of a Life	5.0	Nathalie Granger	1.0	134	
-Science Fiction	8659	Blood: The Last Vampire	5.0	The Day After Tomorrow	2.0	313	
-Comedy	45811	Bob & Carol & Ted & Alice	5.0	Astérix et la surprise de César	0.5	1026	
-Mystery	8659	Straw Dogs	5.0	Harry Potter and the Order of the Phoenix	2.0	239	
-Family	45811	Bugsy Malone	5.0	Astérix et la surprise de César	0.5	198	
-Drama	45811	Ivanhoe	5.0	The Great Escape	0.5	1817	
+Adventure	8659	Le Bossu	4.5	The Day After Tomorrow	2.0	369	
 Animation	45811	The Prince and the Pauper	5.0	Astérix et la surprise de César	0.5	117	
-Western	45811	Johnny Guitar	5.0	¡Three Amigos!	1.0	84	
+Comedy	45811	Bob & Carol & Ted & Alice	5.0	Astérix et la surprise de César	0.5	1026	
+Crime	8659	Young and Innocent	5.0	36 Quai des Orfèvres	2.0	476	
 Documentary	45811	Gunner Palace	5.0	Paper Clips	0.5	215	
-Thriller	8659	Blood: The Last Vampire	5.0	The Day After Tomorrow	2.0	727	
+Drama	45811	Ivanhoe	5.0	The Great Escape	0.5	1817	
+Family	45811	Bugsy Malone	5.0	Astérix et la surprise de César	0.5	198	
 Fantasy	8659	Blood: The Last Vampire	5.0	The Addams Family	0.5	249	
-TV Movie	45811	Straight From the Heart	4.5	Buck Rogers in the 25th Century	1.5	38	
-War	45811	Gunner Palace	5.0	The Great Escape	0.5	120	
+Foreign	45811	Dreams of a Life	5.0	Nathalie Granger	1.0	134	
+History	45811	Gunner Palace	5.0	The Great Escape	0.5	155	
+Horror	45811	X: The Unknown	5.0	Outpost	0.5	350	
 Music	45811	Bugsy Malone	5.0	A Hard Day's Night	0.5	130	
+Mystery	8659	Straw Dogs	5.0	Harry Potter and the Order of the Phoenix	2.0	239	
+Romance	45811	Ivanhoe	5.0	There's Something About Mary	0.5	586	
+Science Fiction	8659	Blood: The Last Vampire	5.0	The Day After Tomorrow	2.0	313	
+TV Movie	45811	Straight From the Heart	4.5	Buck Rogers in the 25th Century	1.5	38	
+Thriller	8659	Blood: The Last Vampire	5.0	The Day After Tomorrow	2.0	727	
+War	45811	Gunner Palace	5.0	The Great Escape	0.5	120	
+Western	45811	Johnny Guitar	5.0	¡Three Amigos!	1.0	84	

@@ -6,7 +6,7 @@ from itertools import product
 import csv
 import sys
 import time
-times = open('times_2nd.txt', 'w+')
+times = open('times_2nd.txt', 'a+')
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
 def split_complex(x):
@@ -59,10 +59,10 @@ def map_output(x):
         return ((movie_id, i, j) for i, j in product(list_ratings, list_movies))
 
 
-spark = SparkSession.builder.appName("repartition-join").getOrCreate()
+spark = SparkSession.builder.appName("repartition-join-100").getOrCreate()
 sc = spark.sparkContext
 start_time = time.time()
-movies = sc.textFile('hdfs://master:9000/movie_data/movies.csv')
+movies = sc.textFile('hdfs://master:9000/movie_data/movies_100.csv')
 rating = sc.textFile('hdfs://master:9000/movie_data/ratings.csv')
 
 movies = sc.parallelize(movies.map(split_complex).map(map_movie).take(100))
@@ -72,7 +72,7 @@ rating = rating.map(map_rating)
 output = rating.union(movies).map(map_list).reduceByKey(reducer).flatMap(map_output)
 
 end_time = time.time()
-times.write("Repartition: "+str((end_time-start_time)/60)+'\n')
+times.write("Repartition-100: "+str((end_time-start_time)/60)+'\n')
 output_list = output.collect()
 
 print(output_list)
