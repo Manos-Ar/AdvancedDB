@@ -86,8 +86,8 @@ print(join_ratings_genres_movies_count.first())
 # (genre,(user_id,movie_id,rating,popularity,count))
 
 
-max_rating = join_ratings_genres_movies_count.reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2])).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2]))
-min_rating = join_ratings_genres_movies_count.reduceByKey(lambda x,y: min((x, y), key=lambda x: x[2])).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2])) 
+max_rating = join_ratings_genres_movies_count.reduceByKey(lambda x,y: max((x, y), key=lambda x: x[2])).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[3]))
+min_rating = join_ratings_genres_movies_count.reduceByKey(lambda x,y: min((x, y), key=lambda x: x[2])).reduceByKey(lambda x,y: max((x, y), key=lambda x: x[3])) 
 # (genre,(user_id,movie_id,rating,popularity,count))
 
 
