@@ -69,10 +69,10 @@ movies = sc.parallelize(genres.map(map_genre).collect())
 rating = rating.map(map_rating)
 
 output = rating.union(movies).map(map_list).reduceByKey(reducer).flatMap(map_output)
+output_list = output.collect()
 
 end_time = time.time()
 times.write("Repartition-100: "+str(end_time-start_time)+'\n')
-output_list = output.collect()
 
 print(output_list)
 

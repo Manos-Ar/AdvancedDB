@@ -56,10 +56,10 @@ br = sc.broadcast(dict(genres.map(map_genre).take(100)))
 rating = rating.map(map_rating)
 
 output = rating.filter(filter_keys).map(join_broadcast)
+output_list = output.collect()
 
 end_time = time.time()
 times.write("Broadcast: "+str(end_time-start_time)+'\n')
-output_list = output.collect()
 print(output_list)
 
 output_file = open("Broadcast.txt", "w+")
