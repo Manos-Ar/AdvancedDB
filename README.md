@@ -1,4 +1,6 @@
 # AdvancedDB
+#### Βασίλης Σταυρόπουλος
+#### Mάνος Αραπίδης
 
 ## Connect To Master
 ```
